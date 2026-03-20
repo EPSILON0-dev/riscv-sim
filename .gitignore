@@ -1,0 +1,10 @@
+# Build artifacts
+build/
+
+# VSCode artifacts
+.vscode/
+.cache/
+build/
+
+# Simplified test environment build artifacts
+tests/env-s/rv64*

@@ -1,0 +1,61 @@
+Checks: '
+bugprone-*,
+-bugprone-easily-swappable-parameters,
+-bugprone-implicit-widening-of-multiplication-result,
+clang-analyzer-*,
+concurrency-*,
+-concurrency-mt-unsafe,
+-cppcoreguidelines-*,
+cppcoreguidelines-owning-memory
+cppcoreguidelines-no-malloc
+cppcoreguidelines-no-new-delete
+cppcoreguidelines-special-member-functions,
+cppcoreguidelines-virtual-class-destructor,
+cppcoreguidelines-narrowing-conversions,
+linuxkernel-*,
+llvm-*
+-llvm-header-guard,
+-llvm-header-guard,
+-llvm-include-order,
+-llvm-prefer-static-over-anonymous-namespace,
+llvmlibc-*,
+-llvmlibc-callee-namespace,
+-llvmlibc-implementation-in-namespace,
+-llvmlibc-inline-function-decl,
+-llvmlibc-restrict-system-libc-headers,
+misc-*,
+-misc-non-private-member-variables-in-classes,
+-misc-use-anonymous-namespace,
+-misc-no-recursion,
+modernize-*,
+-modernize-use-trailing-return-type,
+-modernize-use-nodiscard,
+-modernize-avoid-c-arrays,
+-modernize-use-designated-initializers,
+performance-*,
+-performance-avoid-endl,
+readability-*,
+-readability-uppercase-literal-suffix,
+-readability-function-cognitive-complexity,
+-readability-identifier-length,
+-readability-magic-numbers,
+-readability-math-missing-parentheses,
+-readability-braces-around-statements,
+-readability-else-after-return,
+-readability-redundant-access-specifiers,
+-readability-implicit-bool-conversion,
+-readability-qualified-auto,
+-readability-avoid-nested-conditional-operator,
+-readability-isolate-declaration,
+-readability-redundant-casting,
+-cppcoreguidelines-narrowing-conversions,
+-bugprone-narrowing-conversions,
+'
+HeaderFilterRegex: '.*'
+WarningsAsErrors: '*'
+
+CheckOptions:
+  - key: readability-identifier-naming.FunctionCase
+    value: CamelCase
+  - key: readability-identifier-naming.VariableCase
+    value: camelBack
