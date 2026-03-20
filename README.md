@@ -1,6 +1,6 @@
 # RISC-V Simulator
 
-This is a RISC-V (RVA20S64) simulator capable of running Linux.
+This is a RISC-V (RVA20S64) simulator capable of running Linux. _Actually it's not compliant with RVA20S64 yet, but soon will be ^^_
 
 ## Compatibility
 
