@@ -29,10 +29,17 @@ Planned privileged extensions:
 
 ## Usage
 
-### Compiling RISC-V tests
+### Compiling the simulator
 
 ```sh
-mkdir build
-./configure --prefix=$PWD/build
-make isa RISCV_PREFIX=riscv64-elf-
+cmake -B build; make -j -C build
+```
+
+### Compiling and running simplified environment tests
+
+```sh
+cd tests/env-s
+make -j # use "RISCV_PREFIX=riscv64-unknown-elf-" to set the toolchain prefix
+cd ..
+./test_simplified.sh
 ```
