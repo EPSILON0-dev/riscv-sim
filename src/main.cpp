@@ -136,11 +136,11 @@ int main(int argc, char** argv)
         {
             if (options.ignoreInvalidOps)
             {
-                std::cerr << "CPU halted with error: " << e.what() << std::endl;
+                std::cerr << "Invalid instruction: " << e.what() << std::endl;
             }
             else
             {
-                std::cerr << "Invalid instruction: " << e.what() << std::endl;
+                std::cerr << "CPU halted with error: " << e.what() << std::endl;
                 break;
             }
         }

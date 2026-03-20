@@ -38,7 +38,9 @@ class Operation
         ADDIW, SLLIW, SRLIW, SRAIW,
         ADD, SUB, SLT, SLTU, XOR, OR, AND, SLL, SRL, SRA, 
         ADDW, SUBW, SLLW, SRLW, SRAW,
-        FENCE, FENCE_TSO,
+        MUL, MULH, MULHSU, MULHU, DIV, DIVU, REM, REMU,
+        MULW, DIVW, DIVUW, REMW, REMUW,
+        FENCE, FENCE_TSO, FENCE_I,
         PAUSE, ECALL, EBREAK
     };
     // clang-format on

@@ -27,6 +27,10 @@ class CPU
     static uint64_t SignExtend16(uint64_t value);
     static uint64_t SignExtend32(uint64_t value);
 
+    static uint64_t MulHighSigned(uint64_t value1, uint64_t value2);
+    static uint64_t MulHighSignedUnsigned(uint64_t value1, uint64_t value2);
+    static uint64_t MulHighUnsigned(uint64_t value1, uint64_t value2);
+
     static void CheckAlignment(uint64_t address, uint8_t alignment);
 
     uint64_t LoadMemoryDoubleWord(uint64_t address);

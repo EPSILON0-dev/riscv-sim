@@ -2,9 +2,9 @@ XLEN ?= 64
 src_dir := ../riscv-tests/isa
 
 include $(src_dir)/rv64ui/Makefrag
-# include $(src_dir)/rv64um/Makefrag
+include $(src_dir)/rv64um/Makefrag
 rv64ui_s_tests = $(addprefix rv64ui-s-, $(rv64ui_sc_tests))
-# rv64um_s_tests = $(addprefix rv64um-s-, $(rv64um_sc_tests))
+rv64um_s_tests = $(addprefix rv64um-s-, $(rv64um_sc_tests))
 
 default: all
 
@@ -39,7 +39,7 @@ tests += $$($(1)_tests)
 endef
 
 $(eval $(call compile_template,rv64ui,-march=rv64g -mabi=lp64d))
-# $(eval $(call compile_template,rv64um,-march=rv64g -mabi=lp64d))
+$(eval $(call compile_template,rv64um,-march=rv64g -mabi=lp64d))
 
 tests_dump = $(addsuffix .dump, $(tests))
 tests_hex = $(addsuffix .hex, $(tests))

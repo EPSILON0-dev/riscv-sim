@@ -6,14 +6,14 @@ This is a RISC-V (RVA20S64) simulator capable of running Linux.
 
 Currently implemented modules:
 * RV64I - Base Integer 64-bit instructions
+* M - Integer Multiplication and Division
+* Zifencei - Instruction-Fetch fence (_treated as a hint_)
 
 Planned ISA and Extensions:
-* Zifencei - Instruction-Fetch fence (_treated as a hint_)
 * Zicsr - Control and Status Registers
 * Zimop - May-be-operations
 * Zicntr - Hardware counters
 * Zihpm - Hardware performance monitors
-* M - Integer Multiplication and Division
 * A - Atomic Instructions
 * F - Single-precision Floating Point Operations
 * D - Double-precision Floating Point Operations

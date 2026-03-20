@@ -1,7 +1,10 @@
 #include "cpu.hpp"
 
+#include <cstdint>
 #include <format>
 #include <stdexcept>
+
+#include "operation.hpp"
 
 using namespace Sim;
 
@@ -18,6 +21,37 @@ uint64_t CPU::SignExtend16(uint64_t value)
 uint64_t CPU::SignExtend32(uint64_t value)
 {
     return (value & 0x80000000) ? (value | 0xFFFFFFFF00000000) : value;
+}
+
+uint64_t CPU::MulHighSigned(uint64_t value1, uint64_t value2)
+{
+    uint64_t result = MulHighUnsigned(value1, value2);
+    if (static_cast<int64_t>(value1) < 0) result -= value2;
+    if (static_cast<int64_t>(value2) < 0) result -= value1;
+    return result;
+}
+
+uint64_t CPU::MulHighSignedUnsigned(uint64_t value1, uint64_t value2)
+{
+    uint64_t result = MulHighUnsigned(value1, value2);
+    if (static_cast<int64_t>(value1) < 0) result -= value2;
+    return result;
+}
+
+uint64_t CPU::MulHighUnsigned(uint64_t value1, uint64_t value2)
+{
+    // NOLINTBEGIN(readability-identifier-naming)
+    uint64_t a_lo = value1 & 0xFFFFFFFF, a_hi = value1 >> 32;
+    uint64_t b_lo = value2 & 0xFFFFFFFF, b_hi = value2 >> 32;
+
+    uint64_t lo_lo = a_lo * b_lo;
+    uint64_t hi_lo = a_hi * b_lo;
+    uint64_t lo_hi = a_lo * b_hi;
+    uint64_t hi_hi = a_hi * b_hi;
+
+    uint64_t mid = (lo_lo >> 32) + (hi_lo & 0xFFFFFFFF) + (lo_hi & 0xFFFFFFFF);
+    return hi_hi + (hi_lo >> 32) + (lo_hi >> 32) + (mid >> 32);
+    // NOLINTEND(readability-identifier-naming)
 }
 
 void CPU::CheckAlignment(uint64_t address, uint8_t alignment)
@@ -260,6 +294,93 @@ void CPU::ExecuteArithmetic(const Operation& op)
             result = SignExtend32(result);
             break;
 
+        case Operation::Instruction::MUL:
+            result = static_cast<uint64_t>(value1) * static_cast<uint64_t>(value2);
+            break;
+
+        case Operation::Instruction::MULH:
+            result = MulHighSigned(value1, value2);
+            break;
+
+        case Operation::Instruction::MULHSU:
+            result = MulHighSignedUnsigned(value1, value2);
+            break;
+
+        case Operation::Instruction::MULHU:
+            result = MulHighUnsigned(value1, value2);
+            break;
+
+        case Operation::Instruction::MULW:
+            result = static_cast<uint32_t>(value1) * static_cast<uint32_t>(value2);
+            result = SignExtend32(result);
+            break;
+
+        case Operation::Instruction::DIV:
+            if (static_cast<int64_t>(value1) == INT64_MIN && static_cast<int64_t>(value2) == -1)
+                result = INT64_MIN;
+            else if (value2 == 0)
+                result = -1;
+            else
+                result = static_cast<int64_t>(value1) / static_cast<int64_t>(value2);
+            break;
+
+        case Operation::Instruction::DIVU:
+            if (value2 == 0)
+                result = UINT64_MAX;
+            else
+                result = static_cast<uint64_t>(value1) / static_cast<uint64_t>(value2);
+            break;
+
+        case Operation::Instruction::DIVW:
+            if (static_cast<int32_t>(value1) == INT32_MIN && static_cast<int32_t>(value2) == -1)
+                result = INT32_MIN;
+            else if (value2 == 0)
+                result = -1;
+            else
+                result = SignExtend32(static_cast<int32_t>(value1) / static_cast<int32_t>(value2));
+            break;
+
+        case Operation::Instruction::DIVUW:
+            if (value2 == 0)
+                result = SignExtend32(UINT32_MAX);
+            else
+                result =
+                    SignExtend32(static_cast<uint32_t>(value1) / static_cast<uint32_t>(value2));
+            break;
+
+        case Operation::Instruction::REM:
+            if (static_cast<int64_t>(value1) == INT64_MIN && static_cast<int64_t>(value2) == -1)
+                result = 0;
+            else if (value2 == 0)
+                result = value1;
+            else
+                result = static_cast<int64_t>(value1) % static_cast<int64_t>(value2);
+            break;
+
+        case Operation::Instruction::REMU:
+            if (value2 == 0)
+                result = value1;
+            else
+                result = static_cast<uint64_t>(value1) % static_cast<uint64_t>(value2);
+            break;
+
+        case Operation::Instruction::REMW:
+            if (static_cast<int32_t>(value1) == INT32_MIN && static_cast<int32_t>(value2) == -1)
+                result = 0;
+            else if (value2 == 0)
+                result = SignExtend32(static_cast<int32_t>(value1));
+            else
+                result = SignExtend32(static_cast<int32_t>(value1) % static_cast<int32_t>(value2));
+            break;
+
+        case Operation::Instruction::REMUW:
+            if (value2 == 0)
+                result = SignExtend32(static_cast<uint32_t>(value1));
+            else
+                result =
+                    SignExtend32(static_cast<uint32_t>(value1) % static_cast<uint32_t>(value2));
+            break;
+
         default:
             throw std::runtime_error("Unsupported arithmetic instruction");
             break;
@@ -356,6 +477,7 @@ void CPU::ExecuteMiscMem(const Operation& op)
     switch (op.Instruction())
     {
         case Operation::Instruction::FENCE:
+        case Operation::Instruction::FENCE_I:
         case Operation::Instruction::FENCE_TSO:
             // TODO: Treated as HINTs for now
             break;

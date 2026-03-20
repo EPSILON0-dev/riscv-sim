@@ -138,27 +138,59 @@ void Operation::Decode()
             break;
 
         case InstructionType::OP:
-            // clang-format off
-            switch (funct3_)
+            if (funct7_ == 0x01)
             {
-                case 0b000:
-                    instr_ = (funct7_ == 0x20) ? Instruction::SUB : Instruction::ADD;  
-                    break;
-                case 0b001: instr_ = Instruction::SLL;  break;
-                case 0b010: instr_ = Instruction::SLT;  break;
-                case 0b011: instr_ = Instruction::SLTU; break;
-                case 0b100: instr_ = Instruction::XOR;  break;
-                case 0b101: 
-                    instr_ = (funct7_ == 0x20) ? Instruction::SRA : Instruction::SRL;  
-                    break;
-                case 0b110: instr_ = Instruction::OR;   break;
-                case 0b111: instr_ = Instruction::AND;  break;
-                default: valid = false; break;
+                // clang-format off
+                switch (funct3_)
+                {
+                    case 0b000: instr_ = Instruction::MUL;    break;
+                    case 0b001: instr_ = Instruction::MULH;   break;
+                    case 0b010: instr_ = Instruction::MULHSU; break;
+                    case 0b011: instr_ = Instruction::MULHU;  break;
+                    case 0b100: instr_ = Instruction::DIV;    break;
+                    case 0b101: instr_ = Instruction::DIVU;   break;
+                    case 0b110: instr_ = Instruction::REM;    break;
+                    case 0b111: instr_ = Instruction::REMU;   break;
+                    default: valid = false; break;
+                }
+                // clang-format on
             }
-            // clang-format on
+            else if (funct7_ == 0x00)
+            {
+                // clang-format off
+                switch (funct3_)
+                {
+                    case 0b000: instr_ = Instruction::ADD;  break;
+                    case 0b001: instr_ = Instruction::SLL;  break;
+                    case 0b010: instr_ = Instruction::SLT;  break;
+                    case 0b011: instr_ = Instruction::SLTU; break;
+                    case 0b100: instr_ = Instruction::XOR;  break;
+                    case 0b101: instr_ = Instruction::SRL;  break;
+                    case 0b110: instr_ = Instruction::OR;   break;
+                    case 0b111: instr_ = Instruction::AND;  break;
+                    default: valid = false; break;
+                }
+                // clang-format on
+            }
+            else if (funct7_ == 0x20)
+            {
+                // clang-format off
+                switch (funct3_)
+                {
+                    case 0b000: instr_ = Instruction::SUB;  break;
+                    case 0b101: instr_ = Instruction::SRA;  break;
+                    default: valid = false; break;
+                }
+                // clang-format on
+            }
+            else
+            {
+                valid = false;
+            }
             break;
 
         case InstructionType::OP_IMM:
+            // TODO Verify funct7
             // clang-format off
             switch (funct3_)
             {
@@ -178,22 +210,51 @@ void Operation::Decode()
             break;
 
         case InstructionType::OP_32:
-            // clang-format off
-            switch (funct3_)
+            if (funct7_ == 0x01)
             {
-                case 0b000:
-                    instr_ = (funct7_ == 0x20) ? Instruction::SUBW : Instruction::ADDW;  
-                    break;
-                case 0b001: instr_ = Instruction::SLLW;  break;
-                case 0b101: 
-                    instr_ = (funct7_ == 0x20) ? Instruction::SRAW : Instruction::SRLW;  
-                    break;
-                default: valid = false; break;
+                // clang-format off
+                switch (funct3_)
+                {
+                    case 0b000: instr_ = Instruction::MULW;  break;
+                    case 0b100: instr_ = Instruction::DIVW;  break;
+                    case 0b101: instr_ = Instruction::DIVUW; break;
+                    case 0b110: instr_ = Instruction::REMW;  break;
+                    case 0b111: instr_ = Instruction::REMUW; break;
+                    default: valid = false; break;
+                }
+                // clang-format on
             }
-            // clang-format on
+            else if (funct7_ == 0x00)
+            {
+                // clang-format off
+                switch (funct3_)
+                {
+                    case 0b000: instr_ = Instruction::ADDW;  break;
+                    case 0b001: instr_ = Instruction::SLLW;  break;
+                    case 0b101: instr_ = Instruction::SRLW;  break;
+                    default: valid = false; break;
+                }
+                // clang-format on
+            }
+            else if (funct7_ == 0x20)
+            {
+                // clang-format off
+                switch (funct3_)
+                {
+                    case 0b000: instr_ = Instruction::SUBW;  break;
+                    case 0b101: instr_ = Instruction::SRAW;  break;
+                    default: valid = false; break;
+                }
+                // clang-format on
+            }
+            else
+            {
+                valid = false;
+            }
             break;
 
         case InstructionType::OP_IMM_32:
+            // TODO Verify funct7
             // clang-format off
             switch (funct3_)
             {
@@ -225,6 +286,7 @@ void Operation::Decode()
         case InstructionType::MISC_MEM:
             // clang-format off
             if (opcode_ == 0x8330000f)       instr_ = Instruction::FENCE_TSO;
+            else if (opcode_ == 0x0000100f)  instr_ = Instruction::FENCE_I;
             else if (opcode_ == 0x0100000f)  instr_ = Instruction::PAUSE;
             else if (funct3_ == 0x0)         instr_ = Instruction::FENCE;
             else                             valid = false;
